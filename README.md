@@ -49,41 +49,11 @@ In broad strokes, whichever one you pick:
    project settings (same values as your local `.env`).
 4. Deploy, then point `fusionx.tech`'s DNS at whatever the host gives you when you're ready to go live.
 
-## SEO & AI-crawler visibility
-
-The biggest fix here isn't a meta tag: this is a client-rendered React app, so the raw HTML response
-before any JavaScript runs was just `<div id="root"></div>` — empty. A meaningful share of AI crawlers
-(and plenty of simpler bots) don't execute JavaScript, so they were seeing **nothing**: no headline, no
-services, no company description. `npm run build` now runs `scripts/prerender.mjs` afterward, which loads
-the built site in a real headless browser, waits for it to fully render, and writes that actual rendered
-HTML back over `dist/index.html`. Human visitors still get the full interactive React app (the JS bundle
-is untouched) — they just land on a page that already has content instead of a blank one for that first
-paint. This only runs on `npm run build`; `npm run dev` is unaffected.
-
-Beyond that:
-- `public/robots.txt` — explicitly allows crawling, including a named allow-list for AI crawlers
-  (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, and others) rather than leaving them to a
-  default.
-- `public/sitemap.xml`, `public/llms.txt` — the latter is an emerging (not yet universal) convention some
-  AI systems read for a structured summary of a site.
-- `index.html` — canonical URL, Open Graph + Twitter Card tags, and a JSON-LD `Organization` block. The
-  structured data only states what's actually confirmed (name, url, email) — no fabricated address, phone,
-  or social profile links, since wrong structured data is worse than none.
-- `public/og-image.png` — a real 1200×630 share-preview image, rendered from `scripts/og-card.html` via
-  Playwright (`node scripts/gen-og.mjs`) rather than skipped. Re-run that script if the brand visuals
-  change.
-
-**What none of this can promise**: actual ranking position. That depends on backlinks, domain age,
-competition for the search terms in question, and other things no code change controls. This work makes
-the site fully visible and correctly described to crawlers and AI systems — it doesn't guarantee where it
-places once it's seen.
-
 ## What's a placeholder still
 
 - `CONTACT_FROM_EMAIL` / footer email — using `hello@fusionx.tech`; swap once you've verified the domain with
   Resend.
-- LinkedIn link in the footer — currently a dead `#` link. Worth a real URL soon: it's also the kind of gap
-  that would make sense to fill in `sameAs` in the JSON-LD once it exists.
+- LinkedIn link in the footer — currently a dead `#` link.
 - VOH Opticians' "Case study — coming soon" label — no link yet, unlike Fuse API Hub and Washingtonia
   Nursery which link out to the real sites.
 
