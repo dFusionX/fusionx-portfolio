@@ -75,7 +75,19 @@ async function main() {
 
   await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle', timeout: 30000 });
   // let the hero entrance timeline / GSAP / Three.js finish their first pass
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(1000);
+
+  // Most sections only fade in via GSAP ScrollTrigger as they're scrolled into view — a plain
+  // wait after page load never triggers those, so without this, everything below the hero would
+  // get captured frozen at opacity:0 (readable to a plain-text extractor, but invisible to any
+  // JS-disabled browser or crawler that evaluates the rendered/visual state). Scrolling to the
+  // bottom fires every trigger's "start" condition; scrolling back to top afterward resets the
+  // one *scrubbed* animation (the services lifecycle spine) back to its correct default state
+  // (stage 1 "Build" active) without undoing the one-shot fade-ins, which don't reverse.
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(800);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(500);
 
   const html = await page.content();
   await browser.close();
