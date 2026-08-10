@@ -60,10 +60,11 @@ export default function Services() {
           </div>
         </div>
 
-        <div className="btn-row">
-          <a className="btn btn-ghost" href="#contact">
-            Need someone to take care of your existing software? Talk to an Engineer
-          </a>
+        <p style={{ marginTop: '2rem', color: 'var(--text)', fontFamily: 'var(--font-mono)', fontSize: '.85rem' }}>
+          Need someone to take care of your existing software?
+        </p>
+        <div className="btn-row" style={{ marginTop: '.9rem' }}>
+          <a className="btn btn-ghost" href="#contact">Talk to an Engineer</a>
         </div>
       </div>
     </section>
