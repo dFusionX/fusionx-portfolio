@@ -313,6 +313,56 @@ footer{padding:4rem 0 2rem; font-size:.88rem;}
 
 ::selection{background:var(--plasma); color:#0B0D12;}
 
+/* ---------- custom cursor: a plasma core, an idle ring that quietly rotates (the system is always
+   "scanning"), and — over buttons/cards — four corner brackets that snap into a target-lock reticle
+   around the element instead of a circle awkwardly overlapping its straight edges. Fine-pointer,
+   motion-OK devices only. ---------- */
+html.has-custom-cursor, html.has-custom-cursor a, html.has-custom-cursor button,
+html.has-custom-cursor input, html.has-custom-cursor textarea, html.has-custom-cursor label{
+  cursor:none;
+}
+.cursor-dot, .cursor-ring, .cursor-bracket{
+  position:fixed; top:0; left:0; pointer-events:none; z-index:9999; opacity:0; will-change:transform;
+}
+html.has-custom-cursor .cursor-dot, html.has-custom-cursor .cursor-ring{ opacity:1; }
+.cursor-dot{
+  width:7px; height:7px; border-radius:50%; background:var(--plasma);
+  box-shadow:0 0 8px var(--plasma); transition:opacity .2s ease, width .2s ease, height .2s ease;
+}
+.cursor-dot.is-hovering{width:0; height:0;}
+.cursor-dot.is-pressed{width:4px; height:4px;}
+
+/* width/height/position are driven every frame by the JS lerp (see CustomCursor.tsx) — only
+   color/opacity are left to CSS, so the two easings don't fight each other. */
+.cursor-ring{
+  border-radius:50%; border:1.5px solid var(--steel); background:transparent;
+  transition:border-color .25s ease, background .25s ease, opacity .2s ease;
+}
+.cursor-ring--glow{border-color:var(--plasma); background:var(--plasma-soft);}
+.cursor-ring--dock{opacity:0 !important;}
+.cursor-ring.is-pressed{border-color:var(--plasma-hi);}
+.cursor-ring-spin{
+  position:absolute; inset:-2px; border-radius:50%; border:1.5px dashed var(--steel);
+  opacity:.55; animation:cursor-spin 7s linear infinite;
+}
+@keyframes cursor-spin{to{transform:rotate(360deg);}}
+
+.cursor-bracket{
+  width:18px; height:18px; opacity:0; transition:opacity .18s ease, border-color .2s ease;
+}
+.cursor-bracket.is-visible{opacity:1;}
+.cursor-bracket.is-pressed{border-color:var(--plasma-hi);}
+.cursor-bracket--tl{border-top:2px solid var(--plasma); border-left:2px solid var(--plasma);}
+.cursor-bracket--tr{border-top:2px solid var(--plasma); border-right:2px solid var(--plasma);}
+.cursor-bracket--br{border-bottom:2px solid var(--plasma); border-right:2px solid var(--plasma);}
+.cursor-bracket--bl{border-bottom:2px solid var(--plasma); border-left:2px solid var(--plasma);}
+
+@media (max-width:820px){
+  html.has-custom-cursor, html.has-custom-cursor a, html.has-custom-cursor button,
+  html.has-custom-cursor input, html.has-custom-cursor textarea, html.has-custom-cursor label{cursor:auto;}
+  .cursor-dot, .cursor-ring, .cursor-bracket{display:none;}
+}
+
 /* ---------- animated mark: rings collide into place, then revolve + tumble around a fixed,
    pulsing core, with a plasma pulse continuously traveling along each ring's own line ---------- */
 .fx-ring-base{fill:none; stroke:var(--steel); opacity:.75; transform-box:fill-box; transform-origin:center;}

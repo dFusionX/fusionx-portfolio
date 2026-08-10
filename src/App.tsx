@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import MarkDefs from './components/MarkDefs';
+import CustomCursor from './components/CustomCursor';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
 import Problem from './components/Problem';
@@ -34,6 +35,7 @@ export default function App() {
   return (
     <>
       <MarkDefs />
+      <CustomCursor />
       <Nav />
       <div className="field" />
       <div className="glow" />
