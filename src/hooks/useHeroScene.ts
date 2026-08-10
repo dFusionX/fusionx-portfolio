@@ -81,16 +81,19 @@ export function useHeroScene(canvasRef: RefObject<HTMLCanvasElement>, heroRef: R
     group.rotation.x = 0.15;
     scene.add(group);
 
+    // sized off the canvas's own box, not the section's — the canvas is capped/centered via CSS
+    // (see #hero-canvas) and no longer spans the full section width on wide viewports, so using
+    // heroEl's bounds here would stretch the render to fill a box wider than the canvas actually is.
     const pointer = { x: 0, y: 0 };
     const onPointerMove = (e: PointerEvent) => {
-      const r = heroEl.getBoundingClientRect();
+      const r = canvas.getBoundingClientRect();
       pointer.x = ((e.clientX - r.left) / r.width - 0.5) * 2;
       pointer.y = ((e.clientY - r.top) / r.height - 0.5) * 2;
     };
     heroEl.addEventListener('pointermove', onPointerMove);
 
     function resize() {
-      const r = heroEl!.getBoundingClientRect();
+      const r = canvas!.getBoundingClientRect();
       const w = r.width;
       const h = r.height || window.innerHeight * 0.9;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

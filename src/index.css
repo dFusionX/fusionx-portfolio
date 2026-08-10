@@ -144,7 +144,11 @@ nav a:hover{color:var(--text);} nav a:hover::after{right:0;}
 
 /* ---------- hero ---------- */
 .hero{padding-top:clamp(3.5rem,8vw,6rem); position:relative; overflow:hidden;}
-#hero-canvas{position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:0; transition:opacity 1.2s ease;}
+/* capped and centered, not full-bleed: on very wide monitors the .wrap content column stays at
+   1160px while the section itself spans the whole viewport — a full-bleed canvas would center
+   its scene on the empty viewport instead of on the actual HUD panel it's meant to sit behind. */
+#hero-canvas{position:absolute; top:0; left:50%; height:100%; width:min(100%, 1500px);
+  transform:translateX(-50%); z-index:0; opacity:0; transition:opacity 1.2s ease;}
 #hero-canvas.is-ready{opacity:1;}
 .hero::before{
   content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
