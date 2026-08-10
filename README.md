@@ -1,6 +1,6 @@
 # FusionX — Website
 
-React + TypeScript (Vite) site, with a Vercel serverless function backing the contact form.
+React + TypeScript (Vite) site, with a serverless function backing the contact form.
 
 ## Stack
 
@@ -8,9 +8,11 @@ React + TypeScript (Vite) site, with a Vercel serverless function backing the co
   Next.js 14's minimum (18.17), and for a mostly-static site the extra weight wasn't buying anything anyway.
 - **Three.js** — the hero background scene.
 - **GSAP + ScrollTrigger** — entrance animation and scroll reveals.
-- **Vercel serverless function** (`api/contact.ts`) + **Resend** — sends the contact form as an email. This
-  is the part that makes "a contact form that actually emails you" possible at all; a static site alone can't
-  do it.
+- **Serverless function** (`api/contact.ts`) + **Resend** — sends the contact form as an email. This is the
+  part that makes "a contact form that actually emails you" possible at all; a static site alone can't do it.
+  The function is currently written in the Node-based `(req, res)` serverless format — the most common shape
+  for this kind of function, but worth knowing the exact signature before picking a host, since a couple of
+  platforms (e.g. Cloudflare Workers) expect a different one and would need the file adapted.
 
 ## Running locally
 
@@ -19,8 +21,10 @@ npm install
 npm run dev
 ```
 
-Opens on `http://localhost:5173`. The contact form will show a "not configured" error locally unless you also
-run `vercel dev` (which serves both the Vite frontend and the `/api` function together) — see below.
+Opens on `http://localhost:5173`. The contact form will show a "not configured" error locally unless something
+is also serving `api/contact.ts` as a function alongside the frontend — plain `vite dev` only serves the
+static site, it has no idea `/api` exists. Whatever host you pick will have its own CLI for running that
+locally (for example, Vercel's is `vercel dev`); check its docs for the equivalent.
 
 ## Contact form setup (required before it can send real email)
 
@@ -31,22 +35,19 @@ run `vercel dev` (which serves both the Vite frontend and the `/api` function to
    - `CONTACT_FROM_EMAIL` — leave as `onboarding@resend.dev` until you verify `fusionx.tech` with Resend (Domains
      → Add Domain → add the DNS records they give you at your registrar). Once verified, change this to
      something like `hello@fusionx.tech`.
-3. To test the form locally with the real function running, use the Vercel CLI instead of plain `vite dev`:
-   ```
-   npm i -g vercel
-   vercel dev
-   ```
-   This serves the frontend and `/api/contact` together on one port, reading `.env` automatically.
+3. Test locally using your chosen host's CLI/emulator (see "Running locally" above) so the form has something
+   real to submit to.
 
-## Deploying (Vercel)
+## Deploying
 
-1. Push this repo to GitHub.
-2. Import it at [vercel.com/new](https://vercel.com/new) — Vercel auto-detects Vite and the `/api` folder, no
-   config needed.
-3. In the Vercel project's **Settings → Environment Variables**, add `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, and
-   `CONTACT_FROM_EMAIL` (same values as your local `.env`).
-4. Deploy. Point `fusionx.tech`'s DNS at Vercel under **Settings → Domains** when you're ready to go live on
-   the real domain.
+This needs a host that can run `api/contact.ts` as a serverless function, not just serve static files.
+In broad strokes, whichever one you pick:
+
+1. Push this repo to GitHub (or your host's git provider of choice).
+2. Import/connect the repo — most hosts auto-detect a Vite project.
+3. Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL`, and `CONTACT_FROM_EMAIL` as environment variables in that host's
+   project settings (same values as your local `.env`).
+4. Deploy, then point `fusionx.tech`'s DNS at whatever the host gives you when you're ready to go live.
 
 ## What's a placeholder still
 
