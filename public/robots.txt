@@ -1,0 +1,54 @@
+# FusionX — robots.txt
+# Default: everything is crawlable.
+User-agent: *
+Allow: /
+
+# Explicit allow-list for AI crawlers/answer engines, named individually rather than left to the
+# default wildcard — several of these respect (or are rumored to weight) an explicit mention
+# differently than silence, and this documents intent clearly either way.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+Sitemap: https://fusionx.tech/sitemap.xml

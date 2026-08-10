@@ -27,7 +27,13 @@ export default function CustomCursor() {
   useEffect(() => {
     const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (coarsePointer || reduceMotion) return;
+    if (coarsePointer || reduceMotion) {
+      // the prerendered HTML this page may have shipped as static markup was captured on a
+      // fine-pointer desktop browser, so it can carry this class in from the server — make
+      // sure a real touch/reduced-motion visitor's first paint doesn't inherit it.
+      document.documentElement.classList.remove('has-custom-cursor');
+      return;
+    }
 
     document.documentElement.classList.add('has-custom-cursor');
 

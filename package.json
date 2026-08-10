@@ -5,16 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.json && vite build",
+    "build": "tsc --noEmit -p tsconfig.json && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "gsap": "^3.12.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.160.0",
-    "gsap": "^3.12.5",
-    "resend": "^3.4.0"
+    "resend": "^3.4.0",
+    "three": "^0.160.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
@@ -23,6 +23,7 @@
     "@types/three": "^0.160.0",
     "@vercel/node": "^3.2.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "playwright": "^1.48.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
   }

@@ -1,0 +1,41 @@
+# FusionX
+
+> FusionX is a software engineering company that builds, improves, modernizes, and maintains
+> business software — custom applications, e-commerce, APIs, internal business systems,
+> databases, and infrastructure. It is not a design agency or a marketing/branding studio;
+> the work is software engineering across the full lifecycle of a system.
+
+FusionX works with businesses at any stage of a system's life: building something new,
+optimizing or fixing an existing application, modernizing an aging architecture, migrating a
+system and its data to a new foundation, or maintaining software on an ongoing basis. A
+recurring theme in how FusionX frames its work: existing software and its data are treated as
+assets to build on, not automatically discarded — modernization and migration are offered as
+alternatives to a full rewrite wherever that is the more practical path for the business.
+
+## Services
+
+- Custom software development — web applications, e-commerce, APIs, internal business systems, MVPs
+- Software engineering & optimization — backend/database/API performance, caching, refactoring
+- Software modernization — architecture redesign, legacy modernization, scalability, service decomposition
+- Data & system migration — database migration, schema/data transformation, validation, legacy-to-new migration
+- Ongoing engineering & maintenance — bug fixing, security updates, monitoring, continuous improvement
+- Technical assessment — an evaluation of an existing system's architecture, database, backend, security,
+  and technical debt, producing a current-state analysis, root-cause findings, and a recommended roadmap
+
+## Selected work
+
+- Fuse API Hub (https://fuseapihub.com/info) — an API infrastructure and marketplace platform connecting
+  API providers and consumers, covering distribution, monetization, and management.
+- Washingtonia Nursery (https://www.washingtonianurseryqa.com/) — a business website with services,
+  project showcase, gallery, and lead generation.
+- VOH Opticians — an ongoing engineering and maintenance partnership covering e-commerce, POS, and backend
+  systems for a customer-facing retail platform.
+
+## Full site
+
+- Homepage (all sections: services, technical assessment, how we work, selected work, technology
+  approach, about, contact): https://fusionx.tech/
+
+## Contact
+
+- Email: hello@fusionx.tech
