@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit -p tsconfig.json && vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "postinstall": "playwright install chromium || exit 0"
   },
   "dependencies": {
     "gsap": "^3.12.5",

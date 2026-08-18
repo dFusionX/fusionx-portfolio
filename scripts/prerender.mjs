@@ -67,50 +67,76 @@ async function main() {
   const server = await serve();
 
   console.log('[prerender] launching headless Chromium...');
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  const errors = [];
-  page.on('pageerror', (err) => errors.push(err.message));
-
-  await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle', timeout: 30000 });
-  // let the hero entrance timeline / GSAP / Three.js finish their first pass
-  await page.waitForTimeout(1000);
-
-  // Most sections only fade in via GSAP ScrollTrigger as they're scrolled into view — a plain
-  // wait after page load never triggers those, so without this, everything below the hero would
-  // get captured frozen at opacity:0 (readable to a plain-text extractor, but invisible to any
-  // JS-disabled browser or crawler that evaluates the rendered/visual state). Scrolling to the
-  // bottom fires every trigger's "start" condition; scrolling back to top afterward resets the
-  // one *scrubbed* animation (the services lifecycle spine) back to its correct default state
-  // (stage 1 "Build" active) without undoing the one-shot fade-ins, which don't reverse.
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await page.waitForTimeout(800);
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(500);
-
-  const html = await page.content();
-  await browser.close();
-  server.close();
-
-  if (errors.length) {
-    console.warn('[prerender] the page threw client-side errors during render (site still works for users, but check these):');
-    errors.forEach((e) => console.warn('  -', e));
+  let browser;
+  try {
+    browser = await chromium.launch();
+  } catch (err) {
+    // Chromium's binary is downloaded separately from the playwright package itself (via its
+    // postinstall script), and some build environments (Vercel's build container among them)
+    // either skip that download or can't run the binary once downloaded (missing shared libs,
+    // sandboxing). That's a lost SEO enhancement, not a broken site — dist/index.html is still
+    // the normal client-rendered Vite output real users and JS-executing crawlers get regardless.
+    // So: warn loudly and let the build succeed rather than taking the whole deploy down over it.
+    console.warn('[prerender] could not launch headless Chromium — skipping prerender, shipping the plain client-rendered build instead.');
+    console.warn('[prerender] reason:', err instanceof Error ? err.message : err);
+    server.close();
+    return;
   }
+  try {
+    const page = await browser.newPage();
 
-  // Sanity check against a known real content string rather than parsing DOM structure by regex —
-  // Vite hoists the module script into <head> during build, so "root div directly followed by a
-  // script tag" (the naive assumption) doesn't hold in the built output.
-  const KNOWN_CONTENT = 'Software that keeps your business moving';
-  if (!html.includes(KNOWN_CONTENT) || html.length < 15000) {
-    throw new Error(`Prerendered output looks empty or incomplete (${html.length} bytes, expected content ${html.includes(KNOWN_CONTENT) ? 'found' : 'MISSING'}) — refusing to overwrite dist/index.html.`);
+    const errors = [];
+    page.on('pageerror', (err) => errors.push(err.message));
+
+    await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'networkidle', timeout: 30000 });
+    // let the hero entrance timeline / GSAP / Three.js finish their first pass
+    await page.waitForTimeout(1000);
+
+    // Most sections only fade in via GSAP ScrollTrigger as they're scrolled into view — a plain
+    // wait after page load never triggers those, so without this, everything below the hero would
+    // get captured frozen at opacity:0 (readable to a plain-text extractor, but invisible to any
+    // JS-disabled browser or crawler that evaluates the rendered/visual state). Scrolling to the
+    // bottom fires every trigger's "start" condition; scrolling back to top afterward resets the
+    // one *scrubbed* animation (the services lifecycle spine) back to its correct default state
+    // (stage 1 "Build" active) without undoing the one-shot fade-ins, which don't reverse.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(800);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(500);
+
+    const html = await page.content();
+
+    if (errors.length) {
+      console.warn('[prerender] the page threw client-side errors during render (site still works for users, but check these):');
+      errors.forEach((e) => console.warn('  -', e));
+    }
+
+    // Sanity check against a known real content string rather than parsing DOM structure by regex —
+    // Vite hoists the module script into <head> during build, so "root div directly followed by a
+    // script tag" (the naive assumption) doesn't hold in the built output.
+    const KNOWN_CONTENT = 'Software that keeps your business moving';
+    if (!html.includes(KNOWN_CONTENT) || html.length < 15000) {
+      throw new Error(`Prerendered output looks empty or incomplete (${html.length} bytes, expected content ${html.includes(KNOWN_CONTENT) ? 'found' : 'MISSING'}) — refusing to overwrite dist/index.html.`);
+    }
+
+    fs.writeFileSync(path.join(distDir, 'index.html'), html, 'utf8');
+    console.log(`[prerender] wrote fully-rendered HTML (${(html.length / 1024).toFixed(0)} KB) to dist/index.html`);
+  } catch (err) {
+    // Same principle as the launch failure above: this step is an enhancement, and any failure
+    // here (page crashed, timed out, sanity check tripped) should fall back to the plain
+    // client-rendered build rather than fail the deploy.
+    console.warn('[prerender] render failed — shipping the plain client-rendered build instead.');
+    console.warn('[prerender] reason:', err instanceof Error ? err.message : err);
+  } finally {
+    await browser.close();
+    server.close();
   }
-
-  fs.writeFileSync(path.join(distDir, 'index.html'), html, 'utf8');
-  console.log(`[prerender] wrote fully-rendered HTML (${(html.length / 1024).toFixed(0)} KB) to dist/index.html`);
 }
 
 main().catch((err) => {
+  // Only truly unexpected setup failures (e.g. dist/index.html missing because `vite build`
+  // itself didn't run) reach here — genuinely worth failing loudly on, since that means the
+  // actual site build is broken, not just the SEO enhancement.
   console.error('[prerender] failed:', err);
   process.exit(1);
 });
