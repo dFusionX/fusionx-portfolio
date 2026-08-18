@@ -1,3 +1,5 @@
+import { trackCta } from '../lib/analytics';
+
 const NODES = [
   {
     num: '01', name: 'Build', role: 'Custom Software Development', current: true,
@@ -10,9 +12,12 @@ const NODES = [
     tags: ['DB Tuning', 'Caching', 'Refactoring', 'API Perf'],
   },
   {
-    num: '03', name: 'Modernize', role: 'Software Modernization',
-    desc: "Software often grows faster than its architecture. We bring aging systems up to a standard that supports what's next.",
-    tags: ['Architecture', 'Legacy → New', 'Scalability', 'CDN'],
+    // "Rebuild" was missing from the five pillars entirely, even though it's what the
+    // case study is about. It belongs here — as the far end of modernization, not as a
+    // separate service, so the taxonomy stays at five.
+    num: '03', name: 'Modernize', role: 'Software Modernization & Rebuilds',
+    desc: "Software often grows faster than its architecture. We bring aging systems up to a standard that supports what's next — up to and including rebuilding on a new foundation, when patching has stopped paying off.",
+    tags: ['Architecture', 'Legacy → New', 'Rebuilds', 'Scalability'],
     note: "We don't add complexity because it's fashionable — we choose architecture based on what the business needs.",
   },
   {
@@ -60,11 +65,17 @@ export default function Services() {
           </div>
         </div>
 
-        <p style={{ marginTop: '2rem', color: 'var(--text)', fontFamily: 'var(--font-mono)', fontSize: '.85rem' }}>
-          Need someone to take care of your existing software?
+        <p className="micro" style={{ marginTop: '2rem' }}>
+          Most engagements start at one of these and move into the next. Maintenance runs underneath all of them.
         </p>
         <div className="btn-row" style={{ marginTop: '.9rem' }}>
-          <a className="btn btn-ghost" href="#contact">Talk to an Engineer</a>
+          <a
+            className="btn btn-ghost"
+            href="#contact"
+            onClick={() => trackCta('Talk to an Engineer', 'services')}
+          >
+            Talk to an Engineer
+          </a>
         </div>
       </div>
     </section>

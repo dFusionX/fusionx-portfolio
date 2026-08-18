@@ -11,20 +11,37 @@ import MarkDefs from './components/MarkDefs';
 import CustomCursor from './components/CustomCursor';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
-import Problem from './components/Problem';
-import Services from './components/Services';
+import TwoDoors from './components/TwoDoors';
 import ExistingSoftware from './components/ExistingSoftware';
 import Assessment from './components/Assessment';
-import HowWeWork from './components/HowWeWork';
+import Services from './components/Services';
 import Work from './components/Work';
-import InternalSystems from './components/InternalSystems';
-import Technology from './components/Technology';
-import WhyFusionX from './components/WhyFusionX';
-import About from './components/About';
+import HowWeWork from './components/HowWeWork';
+import WhoWeAre from './components/WhoWeAre';
+import Faq from './components/Faq';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { useScrollAnimations } from './hooks/useScrollAnimations';
 
+/**
+ * Section order, and why it changed.
+ *
+ * Was: Hero → Problem → Services → ExistingSoftware → Assessment → HowWeWork → Work →
+ * InternalSystems → Technology → WhyFusionX → About → Contact.
+ *
+ * That put five restatements of the Build/Improve/Modernize/Migrate/Maintain framework
+ * ahead of any proof, any named human, or any reason to trust two strangers with a
+ * production database.
+ *
+ * Now: identify yourself (TwoDoors) → the differentiating wedge (ExistingSoftware) → the
+ * conversion mechanism (Assessment) → full capability, stated once (Services) → proof
+ * (Work) → process (HowWeWork) → who we actually are (WhoWeAre) → objections (Faq) → ask
+ * (Contact).
+ *
+ * Removed: Problem (became TwoDoors), InternalSystems, Technology, WhyFusionX and About —
+ * the last four are folded into WhoWeAre, which replaces four capability restatements with
+ * the one thing the site never said: who FusionX is.
+ */
 export default function SiteApp() {
   useScrollAnimations();
 
@@ -49,16 +66,14 @@ export default function SiteApp() {
       <div className="glow" />
       <main id="top">
         <Hero />
-        <Problem />
-        <Services />
+        <TwoDoors />
         <ExistingSoftware />
         <Assessment />
-        <HowWeWork />
+        <Services />
         <Work />
-        <InternalSystems />
-        <Technology />
-        <WhyFusionX />
-        <About />
+        <HowWeWork />
+        <WhoWeAre />
+        <Faq />
         <Contact />
       </main>
       <Footer />

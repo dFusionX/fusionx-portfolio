@@ -24,16 +24,19 @@ export function useScrollAnimations() {
         .from('[data-hero="h1"]', { opacity: 0, y: 26, duration: 0.8 }, '-=.3')
         .from('[data-hero="lede"]', { opacity: 0, y: 16, duration: 0.6 }, '-=.5')
         .from('[data-hero="btns"] .btn', { opacity: 0, y: 12, duration: 0.5, stagger: 0.1 }, '-=.4')
+        .from('[data-hero="qualify"]', { opacity: 0, y: 10, duration: 0.5 }, '-=.25')
         .from('[data-hero="hud"]', { x: 24, duration: 0.8 }, '-=.6');
 
       // grouped reveals: stagger children, single reveal for lone blocks
       const groups: [string, string][] = [
-        ['.diag', '.diag-item'],
+        ['.doors', '.door'],
         ['.spine-nodes', '.node'],
         ['.work-grid', '.card'],
         ['.why-grid', '.why-card'],
         ['.timeline', '.step'],
         ['.grid-4', ':scope > div'],
+        ['.people', '.person'],
+        ['.faq', '.faq-item'],
       ];
       groups.forEach(([containerSel, itemSel]) => {
         document.querySelectorAll<HTMLElement>(`${containerSel}.reveal, ${containerSel}`).forEach((container) => {

@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import Mark from './Mark';
+import { trackCta } from '../lib/analytics';
 
+// "Assessment" is promoted into the nav because it's the strongest conversion mechanism on
+// the site. "Approach" comes out to keep the list at five — it's a scroll destination, not
+// something anyone navigates to deliberately, and the footer still links to it.
 const LINKS = [
   { href: '#services', label: 'Services' },
+  { href: '#assessment', label: 'Assessment' },
   { href: '#work', label: 'Work' },
-  { href: '#approach', label: 'Approach' },
   { href: '#about', label: 'About' },
   { href: '#contact', label: 'Contact' },
 ];
@@ -40,8 +44,12 @@ export default function Nav() {
           </ul>
         </nav>
         <div className="nav-right">
-          <a className="btn btn-primary" href="#contact">
-            Start a Conversation
+          <a
+            className="btn btn-primary nav-cta"
+            href="#contact"
+            onClick={() => trackCta('Talk to an Engineer', 'nav')}
+          >
+            Talk to an Engineer
           </a>
           <label className="nav-toggle-label" htmlFor="nav-toggle">
             <span></span>

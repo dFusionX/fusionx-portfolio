@@ -3,13 +3,37 @@ import { Resend } from 'resend';
 // POST /api/contact — validates the submission, then sends it as an email via Resend.
 // Requires RESEND_API_KEY and CONTACT_TO_EMAIL to be set as environment variables
 // (locally in .env, on Vercel under Project Settings → Environment Variables).
+
+const SITUATION_LABELS: Record<string, string> = {
+  'existing-broken': 'Existing software needs fixing / improving / replacing',
+  'new-build': 'New software that doesn’t exist yet',
+  migration: 'Migration to a new system without losing data',
+  takeover: 'Take over and maintain an existing system',
+  assessment: 'Not sure yet — wants an assessment first',
+};
+
+const STAGE_LABELS: Record<string, string> = {
+  exploring: 'Just exploring',
+  budgeted: 'Planning, with budget to allocate',
+  urgent: 'URGENT — something is broken now',
+};
+
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
-  const { name, email, message, company } = (body ?? {}) as Record<string, unknown>;
+  const {
+    name, email, message, phone, company, situation, stage, fx_ref: fxRef, elapsedMs,
+  } = (body ?? {}) as Record<string, unknown>;
 
-  // Honeypot: a field real visitors never see or fill in. If it's non-empty, it's a bot —
-  // report success so the bot moves on, but don't actually send anything.
-  if (typeof company === 'string' && company.trim().length > 0) {
+  // Bot checks. Two of them, because the previous single check used a field named
+  // "company" — which browser autofill and password managers do populate, silently
+  // discarding real enquiries while showing the visitor a success message.
+  //
+  // The honeypot is now named fx_ref (nothing autofills that), and a submission completed
+  // implausibly fast is treated the same way: report success so the bot moves on, send
+  // nothing.
+  const trippedHoneypot = typeof fxRef === 'string' && fxRef.trim().length > 0;
+  const tooFast = typeof elapsedMs === 'number' && elapsedMs >= 0 && elapsedMs < 3000;
+  if (trippedHoneypot || tooFast) {
     return Response.json({ ok: true });
   }
 
@@ -18,7 +42,7 @@ export async function POST(req: Request) {
     typeof email !== 'string' || !email.trim() ||
     typeof message !== 'string' || !message.trim()
   ) {
-    return Response.json({ error: 'Please fill in your name, email, and a message.' }, { status: 400 });
+    return Response.json({ error: 'Please fill in your name, email, and a short description.' }, { status: 400 });
   }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -34,6 +58,27 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Email is not configured on the server yet.' }, { status: 500 });
   }
 
+  const situationKey = typeof situation === 'string' ? situation : '';
+  const stageKey = typeof stage === 'string' ? stage : '';
+  const situationLabel = SITUATION_LABELS[situationKey] || situationKey || 'Not specified';
+  const stageLabel = STAGE_LABELS[stageKey] || stageKey || 'Not specified';
+  const phoneStr = typeof phone === 'string' ? phone.trim() : '';
+  const companyStr = typeof company === 'string' ? company.trim() : '';
+
+  // Subject line carries the triage signal, so urgency and type are visible in the inbox
+  // list without opening anything.
+  const prefix = stageKey === 'urgent' ? '[URGENT] ' : '';
+  const subject = `${prefix}${situationLabel} — ${name}${companyStr ? ` (${companyStr})` : ''}`;
+
+  const rows: [string, string][] = [
+    ['Name', name],
+    ['Email', email],
+    ['Phone', phoneStr || '—'],
+    ['Company', companyStr || '—'],
+    ['Situation', situationLabel],
+    ['Stage', stageLabel],
+  ];
+
   const resend = new Resend(apiKey);
 
   try {
@@ -41,11 +86,18 @@ export async function POST(req: Request) {
       from: `FusionX Contact Form <${fromEmail}>`,
       to: toEmail,
       reply_to: email,
-      subject: `New message from ${name} — FusionX site`,
-      text: `From: ${name} <${email}>\n\n${message}`,
+      subject,
+      text: `${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n---\n\n${message}`,
       html:
-        `<p><strong>From:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>` +
-        `<p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+        `<table style="border-collapse:collapse;font:14px/1.5 system-ui,sans-serif">${rows
+          .map(
+            ([k, v]) =>
+              `<tr><td style="padding:4px 12px 4px 0;color:#666">${escapeHtml(k)}</td>` +
+              `<td style="padding:4px 0"><strong>${escapeHtml(v)}</strong></td></tr>`
+          )
+          .join('')}</table>` +
+        `<hr style="margin:16px 0;border:none;border-top:1px solid #ddd">` +
+        `<p style="font:14px/1.6 system-ui,sans-serif">${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
     });
 
     if (error) {
