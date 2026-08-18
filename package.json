@@ -2,16 +2,15 @@
   "name": "fusionx-site",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit -p tsconfig.json && vite build && node scripts/prerender.mjs",
-    "preview": "vite preview",
-    "lint": "tsc --noEmit",
-    "postinstall": "playwright install chromium || exit 0"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "gsap": "^3.12.5",
+    "next": "^16.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "resend": "^3.4.0",
@@ -22,10 +21,6 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.160.0",
-    "@vercel/node": "^3.2.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "playwright": "^1.48.0",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.0"
+    "typescript": "^5.5.4"
   }
 }
