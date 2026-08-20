@@ -281,9 +281,9 @@ nav a:hover{color:var(--text);} nav a:hover::after{right:0;}
 .card .strap{color:var(--plasma); font-size:.85rem; font-family:var(--font-mono);}
 .card p{color:var(--text-dim); font-size:.88rem;}
 .card .tag-row{margin-top:.2rem;}
-.card-link{margin-top:auto; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.03em; text-decoration:none; color:var(--text);
+.card-link{margin-top:auto; font-family:var(--font-mono); font-size:.78rem; letter-spacing:.03em; text-decoration:none; color:var(--plasma);
   display:inline-flex; align-items:center; gap:.4em;}
-.card-link:hover{color:var(--plasma);}
+.card-link:hover{color:var(--plasma-hi);}
 .card-link.is-pending{color:var(--text-faint); cursor:default;}
 .card.wide{grid-column:span 3; display:grid; grid-template-columns:1fr 1.4fr; gap:2rem; align-items:start;}
 @media (max-width:980px){.card.wide{grid-column:span 1;}}
