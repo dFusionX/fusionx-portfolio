@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { describeInIstAndSgt } from '../../../src/lib/time';
 
 // POST /api/contact — validates the submission, then sends it as an email via Resend.
 // Requires RESEND_API_KEY and CONTACT_TO_EMAIL to be set as environment variables
@@ -21,7 +22,8 @@ const STAGE_LABELS: Record<string, string> = {
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const {
-    name, email, message, phone, company, situation, stage, fx_ref: fxRef, elapsedMs,
+    name, email, message, phone, company, situation, stage, preferredTime,
+    fx_ref: fxRef, elapsedMs,
   } = (body ?? {}) as Record<string, unknown>;
 
   // Bot checks. Two of them, because the previous single check used a field named
@@ -65,6 +67,15 @@ export async function POST(req: Request) {
   const phoneStr = typeof phone === 'string' ? phone.trim() : '';
   const companyStr = typeof company === 'string' ? company.trim() : '';
 
+  // preferredTime arrives as an ISO timestamp (the client already converted the visitor's
+  // local wall-clock entry to it) — reformat into IST/SGT here so the email needs no manual
+  // timezone math to read.
+  let preferredTimeLabel = '';
+  if (typeof preferredTime === 'string' && preferredTime) {
+    const d = new Date(preferredTime);
+    if (!Number.isNaN(d.getTime())) preferredTimeLabel = describeInIstAndSgt(d);
+  }
+
   // Subject line carries the triage signal, so urgency and type are visible in the inbox
   // list without opening anything.
   const prefix = stageKey === 'urgent' ? '[URGENT] ' : '';
@@ -77,6 +88,7 @@ export async function POST(req: Request) {
     ['Company', companyStr || '—'],
     ['Situation', situationLabel],
     ['Stage', stageLabel],
+    ...(preferredTimeLabel ? ([['Preferred call time', preferredTimeLabel]] as [string, string][]) : []),
   ];
 
   const resend = new Resend(apiKey);

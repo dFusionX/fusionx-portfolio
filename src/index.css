@@ -21,6 +21,9 @@
   --font-display:'Plex Cond',Impact,'Arial Narrow',sans-serif;
   --font-body:'Plex Sans',-apple-system,'Segoe UI',sans-serif;
   --font-mono:'Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  /* so native widgets (the datetime-local picker popup, scrollbars, etc.) render in the
+     matching chrome instead of defaulting to a light theme against a dark page */
+  color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -30,6 +33,7 @@
     --steel:#7C93A8; --plasma:#FF6A1A; --plasma-rgb:255,106,26;
     --plasma-hi:#FFB37A; --plasma-soft:rgba(255,106,26,.14);
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px rgba(0,0,0,.35);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
@@ -39,6 +43,7 @@
   --steel:#7C93A8; --plasma:#FF6A1A; --plasma-rgb:255,106,26;
   --plasma-hi:#FFB37A; --plasma-soft:rgba(255,106,26,.14);
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 12px 32px rgba(0,0,0,.35);
+  color-scheme:dark;
 }
 
 /* ---------- reset ---------- */

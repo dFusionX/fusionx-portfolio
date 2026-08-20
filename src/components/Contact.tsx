@@ -1,6 +1,7 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { site, waLink } from '../site.config';
 import { track, trackContactClick } from '../lib/analytics';
+import { describeInIstAndSgt } from '../lib/time';
 
 type Status = 'idle' | 'sending' | 'ok' | 'error';
 
@@ -24,6 +25,16 @@ export default function Contact() {
   const [errorMsg, setErrorMsg] = useState('');
   // Used as a bot check on the server: humans don't complete this form in under 3 seconds.
   const mountedAt = useRef(Date.now());
+  // Preview only — the input itself is uncontrolled (read via FormData on submit, like the
+  // rest of the form). datetime-local has no timezone of its own; it's the visitor's own
+  // local wall-clock time, so `new Date(value)` (parsed in the browser's own timezone) is
+  // already correct — no timezone picker needed from them.
+  const [preferredPreview, setPreferredPreview] = useState('');
+
+  function onPreferredTimeChange(e: ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value;
+    setPreferredPreview(v ? describeInIstAndSgt(new Date(v)) : '');
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -36,6 +47,14 @@ export default function Contact() {
       company: String(data.get('company') || '').trim(),
       situation: String(data.get('situation') || ''),
       stage: String(data.get('stage') || ''),
+      // Sent as an ISO timestamp (unambiguous), not the raw datetime-local string — the
+      // server converts it to IST/SGT itself using the same helper this preview uses.
+      preferredTime: (() => {
+        const raw = String(data.get('preferredTime') || '');
+        if (!raw) return '';
+        const d = new Date(raw);
+        return Number.isNaN(d.getTime()) ? '' : d.toISOString();
+      })(),
       message: String(data.get('message') || '').trim(),
       // Honeypot. Named so that no browser autofill or password manager recognises it —
       // the previous version was called "company", which autofill does populate, and a
@@ -184,6 +203,16 @@ export default function Contact() {
                 </label>
               ))}
             </fieldset>
+
+            <label className="field-label">
+              <span>Preferred time for a call (optional)</span>
+              <input type="datetime-local" name="preferredTime" onChange={onPreferredTimeChange} />
+            </label>
+            {preferredPreview && (
+              <p className="micro" style={{ marginTop: '-.5rem' }}>
+                That&apos;s {preferredPreview}.
+              </p>
+            )}
 
             <label className="field-label">
               <span>What&apos;s going on?</span>
