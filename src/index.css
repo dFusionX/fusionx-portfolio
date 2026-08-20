@@ -118,7 +118,10 @@ section + section{border-top:1px solid var(--line);}
 .btn-primary:disabled{opacity:.6; cursor:not-allowed; transform:none;}
 .btn-ghost{border-color:var(--line-strong); color:var(--text); background:none;}
 .btn-ghost:hover{border-color:var(--plasma); color:var(--plasma);}
-.btn-row{display:flex; flex-wrap:wrap; gap:.9rem; margin-top:2rem;}
+/* align-items:flex-start, not the flex default (stretch) — without it, a long label
+   wrapping to two lines on a narrower viewport grows that button's box, and its sibling
+   (default stretch) grows to match, leaving both buttons visibly mismatched in height. */
+.btn-row{display:flex; flex-wrap:wrap; align-items:flex-start; gap:.9rem; margin-top:2rem;}
 
 /* ---------- nav ---------- */
 header{position:sticky; top:0; z-index:40; backdrop-filter:blur(10px);

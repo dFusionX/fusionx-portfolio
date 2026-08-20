@@ -21,12 +21,17 @@ export default function Footer() {
           <div>
             <h4>Services</h4>
             <ul>
-              {/* Homepage-qualified (/#x, not #x) — this footer is also reused on the
-                  landing pages, which don't have these sections on their own page. */}
-              <li><a href="/#services">Custom Software</a></li>
+              {/* Where a dedicated landing page exists, link straight to it rather than to
+                  the homepage anchor — this is also the only place anything on the site
+                  links to those pages, without it they're only reachable by direct URL or
+                  ad click, which is bad for both visitors and crawling/SEO. This footer is
+                  shared across the homepage and all four landing pages, so it doubles as
+                  the interlinking between them too. */}
+              <li><a href="/business-software-development">Custom Software</a></li>
               <li><a href="/#services">Optimization</a></li>
-              <li><a href="/#services">Modernization &amp; Rebuilds</a></li>
-              <li><a href="/#services">Data Migration</a></li>
+              <li><a href="/legacy-software-modernization">Modernization &amp; Rebuilds</a></li>
+              <li><a href="/data-migration">Data Migration</a></li>
+              <li><a href="/custom-erp">Custom ERP &amp; Internal Systems</a></li>
               <li><a href="/#assessment">Technical Assessment</a></li>
             </ul>
           </div>

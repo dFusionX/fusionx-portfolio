@@ -43,9 +43,9 @@ export default function Hero() {
             <a
               className="btn btn-ghost"
               href="#assessment"
-              onClick={() => trackCta('See how we assess an existing system', 'hero')}
+              onClick={() => trackCta('Get a Technical Assessment', 'hero')}
             >
-              See how we assess an existing system
+              Get a Technical Assessment
             </a>
           </div>
           <p className="hero-qualify" data-hero="qualify">
