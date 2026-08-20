@@ -1,0 +1,27 @@
+import type { Metadata } from 'next';
+import LandingPage from '../../src/components/LandingPage';
+import { dataMigration, metadataFor } from '../../src/content/landing-pages';
+
+export const metadata: Metadata = metadataFor(dataMigration);
+
+const SERVICE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: 'Data Migration',
+  provider: { '@type': 'Organization', name: 'FusionX', url: 'https://fusionx.tech/' },
+  areaServed: 'Worldwide',
+  description: dataMigration.metaDescription,
+};
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICE_JSON_LD) }}
+      />
+      <LandingPage content={dataMigration} />
+    </>
+  );
+}

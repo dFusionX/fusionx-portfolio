@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="wrap">
         <div className="foot-top">
           <div className="foot-brand">
-            <a className="brand" href="#top">
+            <a className="brand" href="/">
               <Mark />
               <span>
                 FUSION<span className="x">X</span>
@@ -21,21 +21,23 @@ export default function Footer() {
           <div>
             <h4>Services</h4>
             <ul>
-              <li><a href="#services">Custom Software</a></li>
-              <li><a href="#services">Optimization</a></li>
-              <li><a href="#services">Modernization &amp; Rebuilds</a></li>
-              <li><a href="#services">Data Migration</a></li>
-              <li><a href="#assessment">Technical Assessment</a></li>
+              {/* Homepage-qualified (/#x, not #x) — this footer is also reused on the
+                  landing pages, which don't have these sections on their own page. */}
+              <li><a href="/#services">Custom Software</a></li>
+              <li><a href="/#services">Optimization</a></li>
+              <li><a href="/#services">Modernization &amp; Rebuilds</a></li>
+              <li><a href="/#services">Data Migration</a></li>
+              <li><a href="/#assessment">Technical Assessment</a></li>
             </ul>
           </div>
           <div>
             <h4>Company</h4>
             <ul>
-              <li><a href="#about">About</a></li>
-              <li><a href="#work">Our Work</a></li>
-              <li><a href="#approach">Approach</a></li>
-              <li><a href="#faq">Questions</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li><a href="/#about">About</a></li>
+              <li><a href="/#work">Our Work</a></li>
+              <li><a href="/#approach">Approach</a></li>
+              <li><a href="/#faq">Questions</a></li>
+              <li><a href="/#contact">Contact</a></li>
             </ul>
           </div>
           <div>

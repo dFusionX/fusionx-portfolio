@@ -35,6 +35,10 @@ alternatives to a full rewrite wherever that is the more practical path for the 
 
 - Homepage (all sections: services, technical assessment, how we work, selected work, technology
   approach, about, contact): https://fusionx.tech/
+- Legacy software modernization: https://fusionx.tech/legacy-software-modernization
+- Custom business software development: https://fusionx.tech/business-software-development
+- Data migration: https://fusionx.tech/data-migration
+- Custom ERP & internal business systems: https://fusionx.tech/custom-erp
 
 ## Contact
 
