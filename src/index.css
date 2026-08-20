@@ -70,6 +70,8 @@ h1,h2,h3{font-family:var(--font-display); font-weight:700; text-wrap:balance; le
 }
 .eyebrow::before{content:"";width:1.1em;height:1px;background:var(--plasma);}
 .lede{max-width:62ch; color:var(--text-dim); font-size:1.05rem;}
+.inline-link{color:var(--plasma); text-decoration:underline; text-decoration-color:currentColor; text-underline-offset:.15em;}
+.inline-link:hover{color:var(--plasma-hi);}
 
 /* ---------- background field ---------- */
 .field{
@@ -158,6 +160,10 @@ nav a:hover{color:var(--text);} nav a:hover::after{right:0;}
 .landing-header{position:sticky; top:0; z-index:40; backdrop-filter:blur(10px);
   background:color-mix(in srgb, var(--ink) 82%, transparent); border-bottom:1px solid var(--line);}
 .landing-header-inner{display:flex; align-items:center; justify-content:space-between; padding:1.05rem clamp(1.25rem,4vw,2.5rem);}
+.landing-breadcrumb{padding:.8rem 0; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.04em;
+  color:var(--text-faint); border-bottom:1px solid var(--line);}
+.landing-breadcrumb a{color:var(--text-dim); text-decoration:none;}
+.landing-breadcrumb a:hover{color:var(--plasma);}
 .landing-hero{padding:clamp(3.5rem,8vw,6rem) 0 clamp(2.5rem,5vw,3.5rem);}
 .landing-hero h1{font-size:clamp(2.2rem,4.6vw,3.6rem); line-height:1.05; margin:1rem 0 1.3rem; max-width:20ch;}
 .landing-hero-lede{max-width:68ch;}
@@ -241,6 +247,9 @@ nav a:hover{color:var(--text);} nav a:hover::after{right:0;}
 .tag{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.03em; color:var(--text-dim);
   border:1px solid var(--line-strong); border-radius:2px; padding:.28em .55em;}
 .node-note{margin-top:.9rem; font-size:.82rem; color:var(--steel); border-left:2px solid var(--steel); padding-left:.7rem;}
+/* .card-link's margin-top:auto only does anything in a flex container (see .card) — .node
+   isn't one, so it needs its own real spacing instead of that auto computing to nothing. */
+.node .card-link{margin-top:.9rem;}
 
 /* ---------- panel (assessment) ---------- */
 .panel{border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow); padding:clamp(1.75rem,4vw,3rem);}

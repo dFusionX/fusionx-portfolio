@@ -75,6 +75,17 @@ export default function LandingPage({ content }: { content: LandingContent }) {
         </div>
       </header>
 
+      {/* Explicit "you're on a subpage, here's the way back" — the logo already links home
+          (standard convention), but this says so in words instead of relying on a visitor
+          recognising that convention. */}
+      <nav className="landing-breadcrumb" aria-label="Breadcrumb">
+        <div className="wrap">
+          <a href="/">fusionx.tech</a>
+          <span aria-hidden="true"> / </span>
+          <span>{content.eyebrow}</span>
+        </div>
+      </nav>
+
       <div className="field" />
       <div className="glow" />
 

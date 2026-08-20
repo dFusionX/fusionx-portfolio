@@ -208,6 +208,18 @@ export function metadataFor(content: LandingContent): Metadata {
   };
 }
 
+/** Matches the visible breadcrumb in LandingPage.tsx — same "Home / this page" structure, as data. */
+export function breadcrumbJsonLdFor(content: LandingContent) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'FusionX', item: 'https://fusionx.tech/' },
+      { '@type': 'ListItem', position: 2, name: content.eyebrow, item: `https://fusionx.tech/${content.slug}` },
+    ],
+  };
+}
+
 export const landingPages: LandingContent[] = [
   legacyModernization,
   businessSoftwareDevelopment,

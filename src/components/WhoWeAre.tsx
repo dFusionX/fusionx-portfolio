@@ -93,7 +93,11 @@ export default function WhoWeAre() {
             <p className="lede">
               We work across the whole lifecycle of a system — from the first idea through production,
               maintenance, modernization and migration. That includes the software nobody outside the business
-              ever sees: POS platforms, inventory, dashboards, operational tools and internal workflow systems.
+              ever sees:{' '}
+              <a className="inline-link" href="/custom-erp">
+                POS platforms, inventory, dashboards, operational tools and internal workflow systems
+              </a>
+              .
             </p>
           </div>
           <div>

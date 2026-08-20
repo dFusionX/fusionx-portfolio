@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import LandingPage from '../../src/components/LandingPage';
-import { legacyModernization, metadataFor } from '../../src/content/landing-pages';
+import { legacyModernization, metadataFor, breadcrumbJsonLdFor } from '../../src/content/landing-pages';
 
 export const metadata: Metadata = metadataFor(legacyModernization);
 
@@ -12,6 +12,7 @@ const SERVICE_JSON_LD = {
   areaServed: 'Worldwide',
   description: legacyModernization.metaDescription,
 };
+const BREADCRUMB_JSON_LD = breadcrumbJsonLdFor(legacyModernization);
 
 export default function Page() {
   return (
@@ -20,6 +21,11 @@ export default function Page() {
         type="application/ld+json"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(SERVICE_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_JSON_LD) }}
       />
       <LandingPage content={legacyModernization} />
     </>

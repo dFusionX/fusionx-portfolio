@@ -5,6 +5,7 @@ const NODES = [
     num: '01', name: 'Build', role: 'Custom Software Development', current: true,
     desc: 'Turn business requirements and workflows into reliable software.',
     tags: ['Web Apps', 'E-commerce', 'APIs', 'Internal Systems', 'MVPs'],
+    href: '/business-software-development', linkLabel: 'More on custom software development →',
   },
   {
     num: '02', name: 'Improve', role: 'Engineering & Optimization',
@@ -19,11 +20,13 @@ const NODES = [
     desc: "Software often grows faster than its architecture. We bring aging systems up to a standard that supports what's next — up to and including rebuilding on a new foundation, when patching has stopped paying off.",
     tags: ['Architecture', 'Legacy → New', 'Rebuilds', 'Scalability'],
     note: "We don't add complexity because it's fashionable — we choose architecture based on what the business needs.",
+    href: '/legacy-software-modernization', linkLabel: 'More on legacy modernization →',
   },
   {
     num: '04', name: 'Migrate', role: 'Data & System Migration',
     desc: "Moving to a new system doesn't mean leaving your business data behind.",
     tags: ['DB Migration', 'Transformation', 'Validation'],
+    href: '/data-migration', linkLabel: 'More on data migration →',
   },
   {
     num: '05', name: 'Maintain', role: 'Ongoing Engineering',
@@ -60,6 +63,11 @@ export default function Services() {
                   ))}
                 </div>
                 {n.note && <p className="node-note">{n.note}</p>}
+                {n.href && (
+                  <a className="card-link" href={n.href} onClick={() => trackCta(n.linkLabel, 'services-node')}>
+                    {n.linkLabel}
+                  </a>
+                )}
               </div>
             ))}
           </div>
