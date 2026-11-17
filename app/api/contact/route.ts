@@ -1,8 +1,8 @@
-import { Resend } from 'resend';
 import { describeInIstAndSgt } from '../../../src/lib/time';
+import {site} from "../../../src/site.config";
 
-// POST /api/contact — validates the submission, then sends it as an email via Resend.
-// Requires RESEND_API_KEY and CONTACT_TO_EMAIL to be set as environment variables
+// POST /api/contact — validates the submission, then sends it via FusionX Mail API.
+// Requires FUSIONX_API_KEY and CONTACT_TO_EMAIL to be set as environment variables
 // (locally in .env, on Vercel under Project Settings → Environment Variables).
 
 const SITUATION_LABELS: Record<string, string> = {
@@ -18,6 +18,19 @@ const STAGE_LABELS: Record<string, string> = {
   budgeted: 'Planning, with budget to allocate',
   urgent: 'URGENT — something is broken now',
 };
+
+function formatRetryDelay(resetIn: string | null) {
+  const seconds = Number(resetIn);
+  if (!Number.isFinite(seconds) || seconds <= 0) return null;
+
+  if (seconds < 60) return `${Math.ceil(seconds)} second${seconds <= 1 ? '' : 's'}`;
+
+  const minutes = Math.ceil(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+
+  const hours = Math.ceil(minutes / 60);
+  return `${hours} hour${hours === 1 ? '' : 's'}`;
+}
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
@@ -51,12 +64,14 @@ export async function POST(req: Request) {
     return Response.json({ error: "That email address doesn't look right." }, { status: 400 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.CONTACT_TO_EMAIL;
-  const fromEmail = process.env.CONTACT_FROM_EMAIL || 'onboarding@resend.dev';
+  const apiKey = process.env.FUSIONX_API_KEY;
+  const toEmail = site.email;
+  const apiUrl = (process.env.FUSIONX_API_URL || 'https://api.fuseapihub.com').replace(/\/+$/, '');
+  // const templateUrl = 'https://fusionx.tech/contact-email-template.html';
+  const templateUrl = 'https://udhayarajan.github.io/test-temp/contact.html';
 
   if (!apiKey || !toEmail) {
-    console.error('Contact form: missing RESEND_API_KEY or CONTACT_TO_EMAIL environment variable.');
+    console.error('Contact form: missing FUSIONX_API_KEY or contact recipient.');
     return Response.json({ error: 'Email is not configured on the server yet.' }, { status: 500 });
   }
 
@@ -82,38 +97,53 @@ export async function POST(req: Request) {
   const subject = `${prefix}${situationLabel} — ${name}${companyStr ? ` (${companyStr})` : ''}`;
 
   const rows: [string, string][] = [
-    ['Name', name],
-    ['Email', email],
-    ['Phone', phoneStr || '—'],
-    ['Company', companyStr || '—'],
-    ['Situation', situationLabel],
-    ['Stage', stageLabel],
+    ['Name', name], ['Email', email], ['Phone', phoneStr || '—'],
+    ['Company', companyStr || '—'], ['Situation', situationLabel], ['Stage', stageLabel],
     ...(preferredTimeLabel ? ([['Preferred call time', preferredTimeLabel]] as [string, string][]) : []),
   ];
-
-  const resend = new Resend(apiKey);
+  const details = `${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\nMessage:\n${message}`;
 
   try {
-    const { error } = await resend.emails.send({
-      from: `FusionX Contact Form <${fromEmail}>`,
-      to: toEmail,
-      reply_to: email,
-      subject,
-      text: `${rows.map(([k, v]) => `${k}: ${v}`).join('\n')}\n\n---\n\n${message}`,
-      html:
-        `<table style="border-collapse:collapse;font:14px/1.5 system-ui,sans-serif">${rows
-          .map(
-            ([k, v]) =>
-              `<tr><td style="padding:4px 12px 4px 0;color:#666">${escapeHtml(k)}</td>` +
-              `<td style="padding:4px 0"><strong>${escapeHtml(v)}</strong></td></tr>`
-          )
-          .join('')}</table>` +
-        `<hr style="margin:16px 0;border:none;border-top:1px solid #ddd">` +
-        `<p style="font:14px/1.6 system-ui,sans-serif">${escapeHtml(message).replace(/\n/g, '<br>')}</p>`,
+    const response = await fetch(`${apiUrl}/v1/send`, {
+      method: 'POST',
+      headers: {
+        'X-FusionX-API-Key': apiKey,
+        'X-FusionX-App-ID': process.env.FUSIONX_APP_ID || 'mailbinder',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ownerEmail: toEmail,
+        subject,
+        templateUrl,
+        payload: {
+          name, email, message, phone: phoneStr || '—', company: companyStr || '—',
+          situation: situationLabel, stage: stageLabel, preferredTime: preferredTimeLabel,
+          details,
+        },
+      }),
     });
 
-    if (error) {
-      console.error('Resend error:', error);
+    if (!response.ok) {
+      console.error('FusionX Mail API error:', response.status, await response.text());
+
+      if (response.status === 429) {
+        const retryDelay = formatRetryDelay(response.headers.get('X-RateLimit-Reset-In'));
+        return Response.json({
+          error: retryDelay
+            ? `Too many messages have been sent. Please try again in ${retryDelay}.`
+            : 'Too many messages have been sent. Please try again shortly.',
+        }, { status: 429 });
+      }
+
+      if (response.status === 403) {
+        const retryDelay = formatRetryDelay(response.headers.get('X-Quota-Reset-In'));
+        return Response.json({
+          error: retryDelay
+            ? `The message quota has been reached. Please try again in ${retryDelay}.`
+            : 'The message quota has been reached. Please try again later.',
+        }, { status: 403 });
+      }
+
       return Response.json({ error: 'Could not send the message. Please try again.' }, { status: 502 });
     }
 
@@ -124,11 +154,3 @@ export async function POST(req: Request) {
   }
 }
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
